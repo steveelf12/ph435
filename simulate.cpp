@@ -2,15 +2,15 @@
 #include <stdlib.h>
 #include <math.h>
 
-/* basic functions */
+// goal: plug in initial beam profile, solve wave equation numerically. print the data. 
+// to do:
+// - double check beam profile against a mathematica plot.
+
+//basic functions:
 
 double power(double x, int j) {
   int i;
   int x_0 = x;
-  if ((j==0) && (x==0)) {
-    printf("error: 0^0\n");
-    exit(1);
-  }
   if (j==0) {
     return 1;
   }
@@ -50,7 +50,7 @@ double laguerre_polynomial(double x, int l, int p) {
   return sum;
 }
 
-/* complex numbers and operators */
+//complex numbers:
 
 class complex {
 public:
@@ -65,6 +65,7 @@ complex operator +(complex z1, complex z2) {
   z0.im = z1.im + z2.im;
   return z0;
 }
+
 complex operator +(complex z, double x) {
   complex z0;
   z0.re = z.re + x;
@@ -97,17 +98,48 @@ double phase(complex z) {
   double phasez = atan2(z.im, z.re);
   return phasez;
 }
-complex expz(complex z) {
+complex expz(double x) { //takes a theta and returns e^(i*theta) (using euler's formula)
   complex expz;
-  expz.re = mod(z)*cos(phase(z));
-  expz.im = mod(z)*sin(phase(z));
+  expz.re = cos(x);
+  expz.im = sin(x);
   return expz;
 }
-
 
 int main() {
   complex I;
   I.re = 0;
   I.im = 1;
+
+  //establish 3d grid:
+  double dx = .1; //scale?
+
+  int Nx = 40;
+  int Ny = 40;
+  int Nz = 240;
+
+  double* beam_profile = new double[Nx*Ny*Nz]; //the non-time dependent function u(r) from the paper.
+  complex* E_phasor = new complex[Nx*Ny*Nz]; //complex valued electric field strength
+  int l = 4;
+  int p = 1;
+
+  double w = 20*dx; //beam waist?
+
+  int i, j, k;
+  double x, y, z;
+
+  for (i=0; i<Nx; i++) {
+    for (j=0; j<Ny; j++) {
+      for (k=0; k<Nz; k++) {
+	x = i*dx;
+	y = j*dx;
+	z = k*dx;
+	beam_profile[k*Nx*Ny + j*Nx + i] = power(-1,p)*power((sqrt(2)*(x*x + y*y)/(w*w)),l)*exp(-(x*x + y*y)/(w*w))*laguerre_polynomial(2*(x*x + y*y)/(w*w),l,p);
+	E_phasor[k*Nx*Ny + j*Nx + i] = beam_profile[k*Nx*Ny + j*Nx + i]*expz(l*atan2(y,x));
+      }
+    }
+  }
+
+  delete[] beam_profile;
+  delete[] E_phasor;
   return 0;
 }
