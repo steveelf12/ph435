@@ -65,7 +65,6 @@ complex operator +(complex z1, complex z2) {
   z0.im = z1.im + z2.im;
   return z0;
 }
-
 complex operator +(complex z, double x) {
   complex z0;
   z0.re = z.re + x;
@@ -78,10 +77,10 @@ complex operator +(double x, complex z) {
 }
 
 //defining multiplication
-complex operator *(complex z, double x) {
+complex operator *(complex z1, double x) {
   complex z0;
-  z0.re = x*z.re;
-  z0.im = x*z.im;
+  z0.re = x*z1.re;
+  z0.im = x*z1.im;
   return z0;
 }
 
@@ -105,11 +104,10 @@ complex expz(complex z) {
   return expz;
 }
 
+
 int main() {
   complex I;
   I.re = 0;
   I.im = 1;
-  complex z0 = 2 + I*3;
-  printf("%f, %f\n",z0.re,z0.im);
   return 0;
 }
