@@ -1,13 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-const double pi = 52163./16604.;
+/* basic functions */
 
-struct complex { 
-  int re;
-  int im;
-};
-  
 double power(double x, int j) {  
   int i;
   int x_0 = x;
@@ -40,15 +36,6 @@ int factorial(int n) {
   return product;
 }
 
-double sin(double x) {
-  double taylor_sum = 0;
-  int i;
-  for (i=0; i<50; i++) {
-    taylor_sum = taylor_sum + power(-1,i)*power(x,(1+2*i))/factorial(1 + 2*i);
-  }
-  return taylor_sum;
-}
-
 int choose(int n, int k) {
   int n_choose_k = factorial(n) / (factorial(k)*(factorial(n-k)));
   return n_choose_k;
@@ -63,7 +50,18 @@ double laguerre_polynomial(double x, int l, int p) {
   return sum;
 }
 
-int main() {
-  printf("%f\n",sin(pi));
+/* complex numbers and operators */
+
+complex exp(complex z) {
+  
+}
+
+typedef struct { 
+  double re;
+  double im;
+} complex;
+
+
+int main() {  
   return 0;
 }
