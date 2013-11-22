@@ -1,14 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-const double pi = 52163./16604.;
+//set up 3d grid. 
 
-struct complex { 
-  int re;
-  int im;
-};
-  
-double power(double x, int j) {  
+double raise_power(double x, int j) {  
   int i;
   int x_0 = x;
   if ((j==0) && (x==0)) {
@@ -31,22 +27,11 @@ int factorial(int n) {
   if (n==0) {
     return 1;
   }
-  else {
-    while (n-1>0) {
-      product = product * (n-1);
-      n = n-1;
-    }
+  while (n-1>0) {
+    product = product * (n-1);
+    n = n-1;
   }
   return product;
-}
-
-double sin(double x) {
-  double taylor_sum = 0;
-  int i;
-  for (i=0; i<50; i++) {
-    taylor_sum = taylor_sum + power(-1,i)*power(x,(1+2*i))/factorial(1 + 2*i);
-  }
-  return taylor_sum;
 }
 
 int choose(int n, int k) {
@@ -58,12 +43,19 @@ double laguerre_polynomial(double x, int l, int p) {
   int i;
   double sum = 0;
   for (i=0; i<=p; i++) {
-    sum = sum + power(-1, i)*choose((p+l),(p-i))*(power(x,i)/factorial(i));
+    printf("i=%d, %f \n",i,raise_power(-1, i)*choose((p+l),(p-i))*(raise_power(x,i)/factorial(i)));
+    sum = sum + raise_power(-1, i)*choose((p+l),(p-i))*(raise_power(x,i)/factorial(i));
   }
   return sum;
 }
 
 int main() {
-  printf("%f\n",sin(pi));
+  int n;
+  int m;
+  for (n=1; n<7; n++) {
+    for (m=1; m<7; m++) {
+      printf("l=%d, p=%d, L = %f\n",n,m,laguerre_polynomial(3.0,n,m));
+    }
+  }
   return 0;
 }
