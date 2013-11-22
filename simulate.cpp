@@ -8,6 +8,10 @@
 
 //basic functions:
 
+const int Nx = 40;
+const int Ny = 40;
+const int Nz = 240;
+
 double power(double x, int j) {
   int i;
   int x_0 = x;
@@ -105,6 +109,24 @@ complex expz(double x) { //takes a theta and returns e^(i*theta) (using euler's 
   return expz;
 }
 
+//prints the state of the beam "now." one file per xy cross section.
+void print_data(double (&data), const char* name) {
+  int i, j, k;
+  for (i=0; i<Nz; i++) {
+    char* filename = new char[64];
+    sprintf(filename,"data/%s_%05d.dat",name,i);
+    FILE *data_file = fopen(filename,"w");
+    for (j=0; j<Ny; j++) {
+      for (k=0; k<Nx; k++) {
+	fprintf(data_file,"%f\t",(&data)[i*Nx*Ny + j*Nx + k]);
+      }
+      fprintf(data_file,"\n");
+    }
+    fclose(data_file);
+    delete[] filename;
+  }
+}
+
 int main() {
   complex I;
   I.re = 0;
@@ -112,10 +134,6 @@ int main() {
 
   //establish 3d grid:
   double dx = .1; //scale?
-
-  int Nx = 40;
-  int Ny = 40;
-  int Nz = 240;
 
   double* beam_profile = new double[Nx*Ny*Nz]; //the non-time dependent function u(r) from the paper.
   complex* E_phasor = new complex[Nx*Ny*Nz]; //complex valued electric field strength
@@ -127,17 +145,19 @@ int main() {
   int i, j, k;
   double x, y, z;
 
-  for (i=0; i<Nx; i++) {
+  for (i=0; i<Nz; i++) {
     for (j=0; j<Ny; j++) {
-      for (k=0; k<Nz; k++) {
-	x = i*dx;
+      for (k=0; k<Nx; k++) {
+	z = i*dx;
 	y = j*dx;
-	z = k*dx;
-	beam_profile[k*Nx*Ny + j*Nx + i] = power(-1,p)*power((sqrt(2)*(x*x + y*y)/(w*w)),l)*exp(-(x*x + y*y)/(w*w))*laguerre_polynomial(2*(x*x + y*y)/(w*w),l,p);
+	x = k*dx;
+	beam_profile[i*Nx*Ny + j*Nx + k] = power(-1,p)*power((sqrt(2)*(x*x + y*y)/(w*w)),l)*exp(-(x*x + y*y)/(w*w))*laguerre_polynomial(2*(x*x + y*y)/(w*w),l,p);
 	E_phasor[k*Nx*Ny + j*Nx + i] = beam_profile[k*Nx*Ny + j*Nx + i]*expz(l*atan2(y,x));
       }
     }
   }
+
+  print_data(*beam_profile, "beam_profile");
 
   delete[] beam_profile;
   delete[] E_phasor;
